@@ -10,7 +10,6 @@ const queryClient = new QueryClient();
 
 // Route pages
 const Root = lazy(() => import('./routes/Root'));
-const About = lazy(() => import('./routes/About'));
 const ErrorPage = lazy(() => import('./components/ErrorPage'));
 
 const router = createBrowserRouter([
@@ -22,22 +21,16 @@ const router = createBrowserRouter([
 			{
 				index: true,
 				async lazy() {
-					let { Users, loader: usersLoader } = await import('./routes/Home');
-					return { Component: Users, loader: usersLoader(queryClient) };
+					let { loader: usersLoader } = await import('./routes/home/loader');
+					let { Users } = await import('./routes/home/Home');
+					return { loader: usersLoader(queryClient), Component: Users };
 				},
-			},
-			{
-				path: '/about',
-				element: (
-					<Suspense fallback={<p>loading...</p>}>
-						<About />
-					</Suspense>
-				),
 			},
 			{
 				path: '/user/:userID',
 				async lazy() {
-					let { User, loader: userLoader } = await import('./routes/User');
+					let { loader: userLoader } = await import('./routes/user/loader');
+					let { User } = await import('./routes/user/User');
 					return {
 						Component: User,
 						loader: userLoader(queryClient),
@@ -45,12 +38,22 @@ const router = createBrowserRouter([
 				},
 			},
 			{
-				path: '/user/posts/:userID',
+				path: '/user/:userID/posts/',
 				async lazy() {
-					let { Posts, loader: postsLoader } = await import('./routes/Posts');
+					let { loader: postsLoader } = await import('./routes/posts/loader');
+					let { Posts } = await import('./routes/posts/Posts');
 					return {
 						Component: Posts,
 						loader: postsLoader(queryClient),
+					};
+				},
+			},
+			{
+				path: '/about',
+				async lazy() {
+					let { About } = await import('./routes/About');
+					return {
+						Component: About,
 					};
 				},
 			},
